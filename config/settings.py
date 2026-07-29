@@ -99,14 +99,5 @@ TIME_ZONE = config("TIME_ZONE", default="UTC")
 USE_I18N = True
 USE_TZ = True
 
-# Static Files
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "orm_workbench" /"static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# Media Files
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-
 # Primary Key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
