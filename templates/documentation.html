@@ -132,34 +132,148 @@ body::after {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 24px;
-  animation: loader-fade-out 0.7s ease-in-out 1.2s forwards;
+  /* stays fully visible for 2.6s, then fades over 0.7s */
+  animation: loader-fade-out 0.7s ease-in-out 2.6s forwards;
 }
-#loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+/* once animation ends, remove from pointer events + hide */
+#loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 @keyframes loader-fade-out {
   0%   { opacity: 1; }
   100% { opacity: 0; visibility: hidden; pointer-events: none; }
 }
 
+/* Horizontal scan sweep */
+#loading-screen::before {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,245,255,0.035) 50%,
+    transparent 100%
+  );
+  animation: loader-scan 1.8s linear infinite;
+  pointer-events: none;
+}
+@keyframes loader-scan {
+  0%   { left: -60%; }
+  100% { left: 110%; }
+}
+
+/* Logo icon */
+.loader-icon {
+  width: 76px; height: 76px;
+  filter:
+    drop-shadow(0 0 16px rgba(0,245,255,0.95))
+    drop-shadow(0 0 42px rgba(0,255,159,0.45));
+  animation: loader-icon-pulse 1.5s ease-in-out infinite;
+}
+@keyframes loader-icon-pulse {
+  0%,100% {
+    filter:
+      drop-shadow(0 0 14px rgba(0,245,255,0.8))
+      drop-shadow(0 0 34px rgba(0,255,159,0.3));
+    transform: scale(1);
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 30px rgba(0,245,255,1))
+      drop-shadow(0 0 70px rgba(0,255,159,0.65));
+    transform: scale(1.07);
+  }
+}
+
+/* Main title */
 .loader-title {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 38px; font-weight: 700;
-  letter-spacing: 12px; text-transform: uppercase;
-  background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-green) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-size: 40px; font-weight: 700;
+  letter-spacing: 10px; text-transform: uppercase;
+  background: linear-gradient(90deg,
+    var(--neon-cyan) 0%,
+    var(--neon-green) 40%,
+    #00cfff 60%,
+    var(--neon-cyan) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   animation: loader-shimmer 2s linear infinite;
+  text-shadow: none;
+  text-align: center;
 }
 @keyframes loader-shimmer {
   0%   { background-position: 250% center; }
   100% { background-position: -250% center; }
 }
-.loader-bar-wrap { width: 200px; height: 2px; background: rgba(0,245,255,0.08); border-radius: 2px; overflow: hidden; }
-.loader-bar {
-  height: 100%; width: 0;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
-  box-shadow: 0 0 10px rgba(0,245,255,0.85);
-  animation: loader-progress 1.2s cubic-bezier(0.42, 0, 0.18, 1) forwards;
+
+/* Subtitle / tagline */
+.loader-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 6px; color: var(--text-mid);
+  text-transform: uppercase;
+  animation: loader-blink 1.3s ease-in-out infinite;
 }
-@keyframes loader-progress { to { width: 100%; } }
+@keyframes loader-blink {
+  0%,100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+/* Progress bar track */
+.loader-bar-wrap {
+  width: 240px; height: 2px;
+  background: rgba(0,245,255,0.08);
+  border-radius: 2px; overflow: hidden;
+  position: relative;
+}
+/* Animated fill */
+.loader-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green), var(--neon-cyan));
+  background-size: 200% 100%;
+  border-radius: 2px;
+  animation:
+    loader-progress 2.55s cubic-bezier(0.42, 0, 0.18, 1) forwards,
+    bar-shine 1s linear infinite;
+  box-shadow: 0 0 10px rgba(0,245,255,0.85), 0 0 24px rgba(0,255,159,0.4);
+}
+@keyframes loader-progress {
+  0%   { width: 0%; }
+  25%  { width: 28%; }
+  55%  { width: 62%; }
+  80%  { width: 84%; }
+  100% { width: 100%; }
+}
+@keyframes bar-shine {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* Status text below bar */
+.loader-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text-dim);
+  letter-spacing: 1.5px;
+  min-height: 14px;
+}
+
+/* Corner decorators */
+.loader-corner {
+  position: absolute;
+  width: 22px; height: 22px;
+  opacity: 0.5;
+}
+.loader-corner svg { width: 100%; height: 100%; }
+.loader-corner.tl { top: 24px; left: 24px; }
+.loader-corner.tr { top: 24px; right: 24px; transform: scaleX(-1); }
+.loader-corner.bl { bottom: 24px; left: 24px; transform: scaleY(-1); }
+.loader-corner.br { bottom: 24px; right: 24px; transform: scale(-1,-1); }
 
 /* NAV */
 nav.orm-nav{height:54px;background:var(--bg-panel);border-bottom:1px solid var(--border-glow);display:flex;align-items:center;padding:0 24px;position:fixed;top:0;left:0;right:0;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.5);gap:16px}
@@ -370,9 +484,55 @@ nav.orm-nav{height:54px;background:var(--bg-panel);border-bottom:1px solid var(-
 </head>
 <body>
 
-<div id="loading-screen">
-  <div class="loader-title">ORM DOCS</div>
-  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+<!-- ════════════════════════════════════════════════════
+     LOADING SCREEN
+════════════════════════════════════════════════════ -->
+<div id="loading-screen" aria-hidden="true">
+
+  <!-- Corner bracket decorators -->
+  <div class="loader-corner tl">
+    <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 12 L2 2 L12 2" stroke="#00f5ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+    </svg>
+  </div>
+  <div class="loader-corner tr">
+    <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 12 L2 2 L12 2" stroke="#00f5ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+    </svg>
+  </div>
+  <div class="loader-corner bl">
+    <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 12 L2 2 L12 2" stroke="#00f5ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+    </svg>
+  </div>
+  <div class="loader-corner br">
+    <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 12 L2 2 L12 2" stroke="#00f5ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+    </svg>
+  </div>
+
+  <!-- Logo mark -->
+  <svg class="loader-icon" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="2" width="30" height="30" rx="7" fill="#050a0f"/>
+    <path d="M17 6 L28 17 L17 28 L6 17 Z" fill="none" stroke="#00f5ff" stroke-width="2"/>
+    <path d="M14.5 11 L21 17 L14.5 23" fill="none" stroke="#00ff9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="17" cy="17" r="2.6" fill="#00f5ff"/>
+  </svg>
+
+  <!-- Main title -->
+  <div class="loader-title">ORM Documentation</div>
+
+  <!-- Tagline -->
+  <div class="loader-sub">Django &middot; Reference Guide &middot; v4.2</div>
+
+  <!-- Progress bar -->
+  <div class="loader-bar-wrap">
+    <div class="loader-bar"></div>
+  </div>
+
+  <!-- Status cycling text -->
+  <div class="loader-status" id="loaderStatus">Initializing environment...</div>
+
 </div>
 
 <div id="viewport-beam"></div>
@@ -394,7 +554,7 @@ nav.orm-nav{height:54px;background:var(--bg-panel);border-bottom:1px solid var(-
   </div>
 </nav>
 
-<a href="#" class="back-btn" title="Back to Shell">
+<a href="{% url "compiler" %}" class="back-btn" title="Back to Shell">
   <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M19 12H5M12 19l-7-7 7-7"/>
   </svg>
@@ -1570,13 +1730,36 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ── INIT ── */
 render();
 
-// Fully hide loading screen after animation
-const ls = document.getElementById('loading-screen');
-if (ls) {
-  ls.addEventListener('animationend', (e) => {
+/* ════════════════════════════════════════
+   LOADING SCREEN LOGIC
+════════════════════════════════════════ */
+const loadingScreen = document.getElementById('loading-screen');
+const loaderStatus  = document.getElementById('loaderStatus');
+
+const statusMessages = [
+  'Initializing environment...',
+  'Loading Django models...',
+  'Connecting to ORM layer...',
+  'Mounting query engine...',
+  'Ready.'
+];
+let msgIdx = 0;
+const statusInterval = setInterval(() => {
+  msgIdx++;
+  if (msgIdx < statusMessages.length) {
+    loaderStatus.textContent = statusMessages[msgIdx];
+  } else {
+    clearInterval(statusInterval);
+  }
+}, 520);
+
+/* After CSS animation ends, fully remove the element */
+if (loadingScreen) {
+  loadingScreen.addEventListener('animationend', (e) => {
     if (e.animationName === 'loader-fade-out') {
-      ls.classList.add('hidden');
-      ls.style.display = 'none';
+      clearInterval(statusInterval);
+      loadingScreen.classList.add('hidden');
+      loadingScreen.style.display = 'none';
     }
   });
 }
