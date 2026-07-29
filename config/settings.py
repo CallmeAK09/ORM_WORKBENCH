@@ -4,7 +4,7 @@ import dj_database_url
 from decouple import config
 
 # Paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Core Settings
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-fallback-key")
@@ -27,7 +27,9 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = []
 
-LOCAL_APPS = []
+LOCAL_APPS = [
+    "applications.documentation",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -99,7 +101,7 @@ USE_TZ = True
 
 # Static Files
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "orm_workbench" /"static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Media Files
