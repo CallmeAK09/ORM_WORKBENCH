@@ -3,3 +3,4 @@ from django.apps import AppConfig
 
 class CompilerConfig(AppConfig):
     name = 'applications.compiler'
+    label = 'compiler'
