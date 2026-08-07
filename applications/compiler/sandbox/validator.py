@@ -45,3 +45,19 @@ def validate_code(code_string):
         return False f"Security error : {e}"
     except Exception as e:
         return False, f"Exception : {e}"
+
+
+def format_validation_error(e):
+    """
+    To format ValidationError into a human readable string.
+    Also handle field specific errors and __all__ errors like UniqueConstraint.
+    """
+    error_msg = "Validation Error : \n"
+    if hasattr(e, 'message_dict'):
+        for field, error in e.message_dict.items():
+            field_display = "Constraint/General" if field == "__all__" else field
+            error_msg += f"- {field_display}: {', '.join(errors)}\n"
+    else:
+        error_msg += f"- {str(e)}"
+
+    return error_msg

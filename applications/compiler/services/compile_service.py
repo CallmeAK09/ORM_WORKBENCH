@@ -5,7 +5,7 @@ from django.db import models, connection
 from django.http import JsonResponse
 from django.db.models import Avg, Sum, Min, Max, Count
 
-from sandbox.validator import validate_code
+from sandbox.validator import validate_code, format_validation_error
 from sandbox.executor import enforce_validation
 from services.database import drop_temp_tables
 from services.model_services imort get_tables_data
