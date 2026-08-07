@@ -1,6 +1,6 @@
 from django.db import models, connection
 
-from applications.compiler.services.serializer import get_field_name, get_record_dict
+from applications.compiler.serializers.serializer import get_field_names, get_record_dict
 from applications.compiler.models import Author, Book, Library
 
 
@@ -50,7 +50,7 @@ def get_tables_data(env=None):
 
         tables_data.append({
             'name':model.__name__,
-            'fields':get_field_name(model),
+            'fields':get_field_names(model),
             'records':[get_record_dict(inst, model) for inst in instances]
         })
 
@@ -97,7 +97,7 @@ def get_tables_data(env=None):
                 
                 tables_data.append({
                     'name':name + '(Custom)',
-                    'fields':get_field_name(obj),
+                    'fields':get_field_names(obj),
                     'records':records
                 })
     

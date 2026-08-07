@@ -1,18 +1,16 @@
+import datetime
 import json
+import uuid
 
+from decimal import Decimal
 from django.db import models
 
 def serialize_value(val):
     """
-    Conver field value into json-string to display in frontend,
+    Convert field value into json-string to display in frontend,
     date/datetime -> ISO string eg:"2026-07-30 12:30"
     Non serializables like UUID, Decimal -> str()
     """
-
-    import datetime
-    import uuid
-    
-    from decimal import Decimal
 
     if val is None:
         return None
@@ -21,9 +19,9 @@ def serialize_value(val):
     if isinstance(val, (Decimal, uuid.UUID)):
         return str(val)
     if isinstance(val, (datetime.datetime,)):
-        return val.strftime('%y-%m-%d %H:%M')
+        return val.strftime('%Y-%m-%d %H:%M')
     if isinstance(val, datetime.date):
-        return val.strftime('%y-%m-%d')
+        return val.strftime('%Y-%m-%d')
     if isinstance(val, dict):
         return {k: serialize_value(v) for k, v in val.items()}
     if isinstance(val, (list, tuple)):
@@ -71,9 +69,9 @@ def get_record_dict(instance, model):
 
     return record
 
-def get_field_name(model):
+def get_field_names(model):
     """ 
-    Rturn the ordered list of column headers,
+    Return the ordered list of column headers,
     Insert FK + __str column right after FK.id column
     """
 

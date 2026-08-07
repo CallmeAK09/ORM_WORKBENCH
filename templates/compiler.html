@@ -828,7 +828,7 @@ textarea.code-editor:focus {
      NAVBAR — logo · Console / Documents · theme · reset
 ════════════════════════════════════════════════════ -->
 <nav class="orm-nav">
-  <a href="/" class="orm-logo">
+  <a href="{% url 'compiler' %}" class="orm-logo">
     <div class="orm-logo-icon">
       <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="2" width="30" height="30" rx="7" fill="#050a0f"/>
@@ -844,8 +844,8 @@ textarea.code-editor:focus {
   </a>
 
   <div class="orm-nav-links">
-    <a href="/" class="orm-nav-link active"><span class="link-text">Console</span></a>
-    <a href="{% url "documentation" %}" class="orm-nav-link"><span class="link-text">Documents</span></a>
+    <a href="{% url 'compiler' %}" class="orm-nav-link active"><span class="link-text">Console</span></a>
+    <a href="{% url 'documentation' %}" class="orm-nav-link"><span class="link-text">Documents</span></a>
   </div>
 
   <div class="orm-nav-spacer"></div>
@@ -855,7 +855,7 @@ textarea.code-editor:focus {
     <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
   </button>
 
-  <a href="" class="exit-hint" title="Exit Shell / Reset Session">
+  <a href="{% url 'reset' %}" class="exit-hint" title="Exit Shell / Reset Session">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 12a9 9 0 1 1-3-6.7"/>
       <polyline points="21 3 21 9 15 9"/>
@@ -1161,7 +1161,7 @@ textarea.code-editor:focus {
     if (!code) { termLog('Nothing to save.', 't-warn'); return; }
     saveModelsBtn.classList.add('running'); saveModelsBtn.textContent = '⟳ Saving…';
     termSet('<span class="t-info">Validating and saving models...</span>');
-    const { data } = await apiFetch('/api/save_models/', { models_code: code });
+    const { data } = await apiFetch("{% url 'save_models' %}", { models_code: code });
     saveModelsBtn.classList.remove('running'); saveModelsBtn.textContent = '✓ Save Models';
     if (data.status === 'success') {
       termSet(''); termLog('[OK] ' + (data.message || 'Models saved successfully.'), 't-ok');
@@ -1178,7 +1178,7 @@ textarea.code-editor:focus {
     if (!query) { termLog('No query to run.', 't-warn'); return; }
     runBtn.classList.add('running'); runBtn.textContent = '⟳ Running…';
     termSet('<span class="t-info">Executing query...</span>');
-    const { data } = await apiFetch('/api/execute/', { query });
+    const { data } = await apiFetch("{% url 'execute_query' %}", { query });
     runBtn.classList.remove('running'); runBtn.textContent = '▶ Run Query';
     if (data.status === 'success') {
       termSet('');
@@ -1190,7 +1190,8 @@ textarea.code-editor:focus {
     }
   };
 
-  /* ── Tab indent ── */
+
+  /* ── Tab & Auto Indent ── */
   document.querySelectorAll('.code-editor').forEach(ed => {
     ed.addEventListener('keydown', e => {
       if (e.key === 'Tab') {
@@ -1198,6 +1199,21 @@ textarea.code-editor:focus {
         const s = ed.selectionStart, end = ed.selectionEnd;
         ed.value = ed.value.substring(0, s) + '    ' + ed.value.substring(end);
         ed.selectionStart = ed.selectionEnd = s + 4;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const pos = ed.selectionStart;
+        const text = ed.value;
+        const lastNewLine = text.lastIndexOf('\n', pos - 1);
+        const startOfLine = lastNewLine + 1;
+        const currentLine = text.substring(startOfLine, pos);
+        const match = currentLine.match(/^\s*/);
+        let indent = match ? match[0] : '';
+        if (currentLine.trim().endsWith(':')) {
+          indent += '    ';
+        }
+        ed.value = text.substring(0, pos) + '\n' + indent + text.substring(pos);
+        ed.selectionStart = ed.selectionEnd = pos + 1 + indent.length;
       }
     });
   });
