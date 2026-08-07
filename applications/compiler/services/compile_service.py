@@ -1,17 +1,18 @@
 import json
-import trackback
+import traceback
 import io
 import contextlib
 
 from django.db import models, connection
 from django.http import JsonResponse
 from django.db.models import Avg, Sum, Min, Max, Count
+from django.core.exceptions import ValidationError
 
-from sandbox.validator import validate_code, format_validation_error
-from sandbox.executor import enforce_validation
-from services.database import drop_temp_tables
-from services.model_services imort get_tables_data
-from compiler.models import Author, Book, Library
+from .database import drop_temp_tables
+from .model_service import get_tables_data, inject_app_label
+from applications.compiler.sandbox.validator import validate_code, format_validation_error
+from applications.compiler.sandbox.executor import enforce_validation
+from applications.compiler.models import Author, Book, Library
 
 
 def save_model_service(request):
@@ -22,25 +23,25 @@ def save_model_service(request):
 
             is_valid, msg = validate_code(models_code)
             if not is_valid:
-                return JsonResponse({'status':'error', 'ouput':msg})
+                return JsonResponse({'status':'error', 'output':msg})
 
             old_code = request.session.get('temp_models_code', '')
             if models_code != old_code:
                 drop_temp_tables()
 
-            request.session['temp_models-code'] = models_code
+            request.session['temp_models_code'] = models_code
             request.session.modified = True
 
             env = {
                 'models':models,
                 'connection':connection,
-                '__name__':'compiler.models'
-                'Author':Author, 'Book':Book, 'Library';Library
+                '__name__':'compiler.models',
+                'Author':Author, 'Book':Book, 'Library':Library,
                 'Avg':Avg, 'Sum':Sum, 'Min':Min, 'Max':Max, 'Count':Count,
             }
 
             with enforce_validation():
-                exec(model_code, env)
+                exec(models_code, env)
 
             tables_data = get_tables_data(env)
 
@@ -52,8 +53,8 @@ def save_model_service(request):
 
         except ValidationError as e:
             return JsonResponse({"status":'error', "output":format_validation_error(e)}) 
-        except Exceptiion:
-            return JsonResponse({'stauts':'error', 'output':trackback.format_exc()})
+        except Exception:
+            return JsonResponse({'status':'error', 'output':traceback.format_exc()})
             
 
 def execute_query(request):
@@ -65,12 +66,12 @@ def execute_query(request):
             env = {
                 'models':models,
                 'connection':connection,
-                '__name__':'compiler.models'
-                'Author':Author, 'Book':Book, 'Library';Library
+                '__name__':'compiler.models',
+                'Author':Author, 'Book':Book, 'Library':Library,
                 'Avg':Avg, 'Sum':Sum, 'Min':Min, 'Max':Max, 'Count':Count,
             }
 
-            is_valid, msg = validate_code(query_code):
+            is_valid, msg = validate_code(query_code)
             if not is_valid:
                 return JsonResponse({'status': 'error', 'output': msg})
 
@@ -78,7 +79,7 @@ def execute_query(request):
             if temp_models_code:
                 exec(temp_models_code, env)
 
-            with enforced_validation():
+            with enforce_validation():
                 output_buffer = io.StringIO()
                 with contextlib.redirect_stdout(output_buffer):
                     try:
@@ -94,7 +95,7 @@ def execute_query(request):
         
         except ValidationError as e:
             return JsonResponse({"status":'error', "output":format_validation_error(e)}) 
-        except Exceptiion:
-            return JsonResponse({'stauts':'error', 'output':trackback.format_exc()})
+        except Exception:
+            return JsonResponse({'status':'error', 'output':traceback.format_exc()})
             
-    return Jsonresponse({'status':error, 'message':'Invalid method'}, status=405)
+    return JsonResponse({'status':'error', 'message':'Invalid method'}, status=405)
