@@ -102,3 +102,6 @@ USE_TZ = True
 
 # Primary Key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Static Files
+STATIC_URL = "static/"
