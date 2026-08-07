@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ORM Workbench — {{ request.user.username|default:"Dashboard" }}</title>
+<title>ORM Workbench — Console</title>
 
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect x='2' y='2' width='30' height='30' rx='7' fill='%23050a0f'/%3E%3Cpath d='M17 6 L28 17 L17 28 L6 17 Z' fill='none' stroke='%2300f5ff' stroke-width='2'/%3E%3Cpath d='M14.5 11 L21 17 L14.5 23' fill='none' stroke='%2300ff9f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='17' cy='17' r='2.6' fill='%2300f5ff'/%3E%3C/svg%3E">
 
@@ -296,29 +296,6 @@ body::after {
   animation: vb-spin 6s linear infinite;
 }
 
-/* ═══════════════════════════════════════════════════════
-   THEME TOGGLE
-═══════════════════════════════════════════════════════ */
-.theme-toggle {
-  background: rgba(0,245,255,0.05);
-  border: 1px solid var(--border-dim);
-  border-radius: 6px;
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.2s;
-  color: var(--text-mid);
-}
-.theme-toggle:hover {
-  background: rgba(0,245,255,0.1);
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0,245,255,0.2);
-}
-.theme-toggle svg { width: 16px; height: 16px; }
-.theme-toggle .sun { display: none; }
-.theme-toggle .moon { display: block; }
-.light-theme .theme-toggle .sun { display: block; }
-.light-theme .theme-toggle .moon { display: none; }
 @keyframes vb-spin { to { --vb-angle: 360deg; } }
 
 @supports not (background: conic-gradient(from 0deg, red, blue)) {
@@ -344,7 +321,7 @@ body::after {
 }
 
 /* ═══════════════════════════════════════════════════════
-   NAVBAR
+   NAVBAR — logo + Console / Documents + theme + reset
 ═══════════════════════════════════════════════════════ */
 nav.orm-nav {
   height: 54px; background: var(--bg-panel);
@@ -395,7 +372,52 @@ nav.orm-nav::after {
   letter-spacing: 3px; color: var(--text-dim);
   text-transform: uppercase; font-weight: 500; line-height: 1;
 }
+
+/* Console / Documents nav tabs */
+.orm-nav-links {
+  display: flex; align-items: center; gap: 6px;
+  margin-left: 18px; flex-shrink: 0;
+}
+.orm-nav-link {
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-mid); text-decoration: none;
+  padding: 7px 14px; border-radius: 5px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.orm-nav-link:hover {
+  color: var(--text-bright); border-color: var(--border-dim);
+  background: rgba(0,245,255,0.04);
+}
+.orm-nav-link.active {
+  color: var(--neon-cyan); border-color: rgba(0,245,255,0.35);
+  background: rgba(0,245,255,0.08);
+  box-shadow: 0 0 10px rgba(0,245,255,0.15);
+}
+
 .orm-nav-spacer { flex: 1; }
+
+.theme-toggle {
+  background: rgba(0,245,255,0.05);
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+  color: var(--text-mid); flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: rgba(0,245,255,0.1);
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0,245,255,0.2);
+}
+.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle .sun { display: none; }
+.theme-toggle .moon { display: block; }
+.light-theme .theme-toggle .sun { display: block; }
+.light-theme .theme-toggle .moon { display: none; }
 
 .exit-hint {
   display: flex; align-items: center; gap: 6px;
@@ -428,102 +450,93 @@ nav.orm-nav::after {
 @media (max-width: 480px) {
   .exit-hint span { display: none; }
   .exit-hint { padding: 5px 8px; }
+  .orm-nav-link span.link-text { display: none; }
 }
 
-.orm-profile {
-  display: flex; align-items: center; gap: 7px;
-  padding: 4px 9px 4px 4px; border: 1px solid var(--border-glow);
-  border-radius: 28px; cursor: pointer;
-  background: rgba(0,245,255,0.03);
-  transition: all 0.2s; position: relative;
-  user-select: none; flex-shrink: 0;
-}
-.orm-profile:hover {
-  border-color: rgba(0,245,255,0.5); background: rgba(0,245,255,0.07);
-  box-shadow: 0 0 12px rgba(0,245,255,0.12);
-}
-.orm-profile.is-open {
-  border-color: var(--neon-cyan); background: rgba(0,245,255,0.08);
-  box-shadow: 0 0 10px rgba(0,245,255,0.35), 0 0 24px rgba(0,245,255,0.1);
-}
-.profile-avatar {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--neon-blue), var(--neon-green));
+/* ═══════════════════════════════════════════════════════
+   AD BANNERS — placeholders shown only when published
+═══════════════════════════════════════════════════════ */
+.ad-slot {
+  flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700;
-  color: var(--bg-void); flex-shrink: 0;
-  box-shadow: 0 0 8px rgba(0,255,159,0.35); overflow: hidden;
+  border: 1px dashed var(--border-glow);
+  background: rgba(0,245,255,0.015);
+  color: var(--text-dim);
+  font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  position: relative;
 }
-.profile-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-.profile-name {
-  font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 13px;
-  color: var(--text-bright); letter-spacing: 0.5px;
-  max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.ad-slot .ad-tag {
+  position: absolute; top: 4px; left: 8px;
+  font-size: 8px; letter-spacing: 1.5px; color: var(--text-dim); opacity: 0.7;
 }
-@media (max-width: 480px) { .profile-name { display: none; } }
-.profile-chevron { width: 10px; height: 6px; flex-shrink: 0; transition: transform 0.2s; }
-.orm-profile.is-open .profile-chevron { transform: rotate(180deg); }
-
-.profile-dropdown {
-  display: none; position: absolute; top: calc(100% + 10px); right: 0;
-  background: var(--bg-surface); border: 1px solid var(--border-glow);
-  border-radius: 10px; min-width: 190px;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.8), 0 0 24px rgba(0,245,255,0.07);
-  overflow: hidden; z-index: 2000;
-  animation: drop-in 0.18s ease-out;
-}
-@keyframes drop-in {
-  from { opacity:0; transform:translateY(-8px) scale(0.97); }
-  to   { opacity:1; transform:translateY(0) scale(1); }
-}
-.orm-profile.is-open .profile-dropdown { display: block; }
-.drop-head {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 14px; background: var(--bg-elevated);
-  border-bottom: 1px solid var(--border-dim);
-}
-.drop-head-av {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--neon-blue), var(--neon-green));
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
-  color: var(--bg-void); flex-shrink: 0; overflow: hidden;
-}
-.drop-head-av img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-.drop-head-name {
-  font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700;
-  color: var(--text-bright); letter-spacing: 0.5px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.drop-head-role {
-  font-size: 10px; color: var(--text-dim);
-  font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; text-transform: uppercase;
-}
-.drop-item {
-  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-  font-size: 12px; color: var(--text-mid); cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.5px;
-  text-decoration: none;
-}
-.drop-item:hover { background: rgba(0,245,255,0.07); color: var(--neon-cyan); }
-.drop-item svg { width:13px; height:13px; flex-shrink:0; opacity:0.75; }
-.drop-divider { height:1px; background:var(--border-dim); margin:3px 0; }
-.drop-item.danger { color: #cc4455; }
-.drop-item.danger svg { opacity: 1; }
-.drop-item.danger:hover { background: rgba(255,50,80,0.07); color: #ff5060; }
+#adTop { height: 46px; margin: 0; border-left: none; border-right: none; border-top: none; }
+#adBottom { height: 54px; margin: 10px 14px 12px 14px; border-radius: 6px; }
 
 /* ═══════════════════════════════════════════════════════
    APP LAYOUT
 ═══════════════════════════════════════════════════════ */
 .app-container {
   display: flex; flex-direction: column;
-  height: calc(100vh - 54px); overflow: hidden;
+  height: calc(100vh - 54px - 46px); overflow: hidden;
 }
 .top-section {
   display: flex; flex: 1; min-height: 0;
   border-bottom: 1px solid var(--border-glow);
   overflow: hidden; position: relative;
+}
+
+/* Slim icon sidebar: switch between Console & Model */
+.console-sidebar {
+  width: 46px; flex-shrink: 0;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-glow);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 0; gap: 8px;
+}
+.sidebar-btn {
+  width: 32px; height: 32px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border-dim); background: transparent;
+  color: var(--text-dim); cursor: pointer; transition: all 0.2s;
+  position: relative;
+}
+.sidebar-btn svg { width: 15px; height: 15px; }
+.sidebar-btn:hover { color: var(--text-mid); border-color: var(--border-glow); }
+.sidebar-btn.active {
+  color: var(--neon-cyan); border-color: rgba(0,245,255,0.4);
+  background: rgba(0,245,255,0.08);
+  box-shadow: 0 0 10px rgba(0,245,255,0.18);
+}
+.sidebar-btn.active::before {
+  content: ''; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 18px; border-radius: 2px;
+  background: linear-gradient(180deg, var(--neon-cyan), var(--neon-green));
+  box-shadow: 0 0 8px rgba(0,245,255,0.6);
+}
+.sidebar-divider { width: 20px; height: 1px; background: var(--border-dim); margin: 2px 0; }
+
+/* Themed hover tooltip for sidebar icons */
+.sidebar-btn[data-tooltip] {
+  position: relative;
+}
+.sidebar-btn[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%) translateX(-4px);
+  background: var(--bg-elevated); color: var(--text-bright);
+  border: 1px solid var(--border-glow);
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 10.5px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 5px 9px; border-radius: 5px; white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.55), 0 0 10px rgba(0,245,255,0.1);
+  opacity: 0; pointer-events: none; z-index: 50;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.sidebar-btn[data-tooltip]:hover::after {
+  opacity: 1; transform: translateY(-50%) translateX(0);
+}
+@media (max-width: 768px) {
+  .sidebar-btn[data-tooltip]::after { display: none; }
 }
 
 .left-pane {
@@ -535,43 +548,11 @@ nav.orm-nav::after {
 }
 
 .editor-sub-pane {
-  display: flex; flex-direction: column;
-  padding: 14px 14px 8px 14px;
-  min-height: 80px; overflow: hidden;
+  display: none; flex-direction: column;
+  padding: 14px; min-height: 0; overflow: hidden;
   flex: 1;
 }
-.editor-sub-pane:last-of-type {
-  padding-top: 8px; padding-bottom: 14px;
-}
-
-.inner-v-resizer {
-  height: 6px; cursor: row-resize;
-  background: var(--border-dim);
-  flex-shrink: 0; z-index: 10;
-  transition: background 0.2s; position: relative;
-}
-.inner-v-resizer::before {
-  content: ''; position: absolute; left: 50%; top: 50%;
-  transform: translate(-50%,-50%);
-  height: 2px; width: 48px; border-radius: 2px;
-  background: var(--text-dim); transition: background 0.2s;
-}
-.inner-v-resizer:hover, .inner-v-resizer.dragging { background: rgba(0,245,255,0.18); }
-.inner-v-resizer:hover::before, .inner-v-resizer.dragging::before { background: var(--neon-cyan); }
-.inner-v-resizer::after {
-  content: ''; position: absolute;
-  top: -1px; left: 0;
-  height: 3px; width: 80px;
-  background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-green), transparent);
-  animation: inner-beam 2.4s linear infinite;
-  border-radius: 2px; pointer-events: none;
-}
-@keyframes inner-beam {
-  0%   { left: -90px; opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { left: 100%; opacity: 0; }
-}
+.editor-sub-pane.active { display: flex; }
 
 .right-pane {
   display: flex; flex-direction: column;
@@ -623,17 +604,19 @@ nav.orm-nav::after {
   html, body { overflow: auto; height: auto; }
   .app-container { height: auto; overflow: visible; }
   .top-section { flex-direction: column; overflow: visible; height: auto; }
+  .console-sidebar { flex-direction: row; width: 100%; border-right: none; border-bottom: 1px solid var(--border-glow); padding: 8px 10px; }
+  .sidebar-divider { display: none; }
   .left-pane {
     width: 100% !important; border-right: none;
     border-bottom: 1px solid var(--border-glow);
-    min-height: 340px; overflow: visible; flex-shrink: 1; height: auto;
+    min-height: 300px; overflow: visible; flex-shrink: 1; height: auto;
   }
   .right-pane { height: auto; min-height: 280px; flex-shrink: 1; overflow: visible; }
   .bottom-section { height: auto; min-height: 260px; flex-shrink: 0; }
-  .h-resizer, .v-resizer, .inner-v-resizer { display: none; }
-  .editor-sub-pane { min-height: 160px; }
-  textarea.code-editor { min-height: 130px; }
+  .h-resizer, .v-resizer { display: none; }
+  textarea.code-editor { min-height: 160px; }
   #terminal-output { min-height: 200px; }
+  #adBottom { margin: 10px; }
 
   /* Smaller loader on mobile */
   .loader-title { font-size: 30px; letter-spacing: 8px; }
@@ -842,7 +825,7 @@ textarea.code-editor:focus {
 <form style="display:none">{% csrf_token %}</form>
 
 <!-- ════════════════════════════════════════════════════
-     NAVBAR
+     NAVBAR — logo · Console / Documents · theme · reset
 ════════════════════════════════════════════════════ -->
 <nav class="orm-nav">
   <a href="/" class="orm-logo">
@@ -860,12 +843,12 @@ textarea.code-editor:focus {
     </div>
   </a>
 
-  <div class="orm-nav-spacer"></div>
+  <div class="orm-nav-links">
+    <a href="/" class="orm-nav-link active"><span class="link-text">Console</span></a>
+    <a href="{% url "documentation" %}" class="orm-nav-link"><span class="link-text">Documents</span></a>
+  </div>
 
-  <a href="{% url "documentation" %}" class="drop-item">
-    <svg viewBox="0 0 16 16" fill="none"><path d="M4 3h8a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3"/><path d="M6 6h4M6 9h4M6 12h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        ORM DOCs
-  </a>
+  <div class="orm-nav-spacer"></div>
 
   <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
     <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -882,6 +865,9 @@ textarea.code-editor:focus {
 
 </nav>
 
+<!-- Top ad slot -->
+<div class="ad-slot" id="adTop"><span class="ad-tag">Ad</span>Advertisement space — shown when published</div>
+
 <!-- ════════════════════════════════════════════════════
      MAIN APP
 ════════════════════════════════════════════════════ -->
@@ -890,7 +876,24 @@ textarea.code-editor:focus {
 
   <div class="top-section" id="topSection">
 
-    <!-- LEFT: Models + Query editors -->
+    <!-- Slim sidebar: switch between Console and Model -->
+    <div class="console-sidebar" id="consoleSidebar">
+      <button class="sidebar-btn active" id="sidebarConsoleBtn" data-pane="queryPane" data-tooltip="Console">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+      </button>
+      <div class="sidebar-divider"></div>
+      <button class="sidebar-btn" id="sidebarModelBtn" data-pane="modelsPane" data-tooltip="Model">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 3h8a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z"></path>
+          <path d="M6 6h4M6 9h4M6 12h2"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Models + Query editors (one visible at a time) -->
     <div class="left-pane" id="leftPane">
 
       <div class="editor-sub-pane" id="modelsPane">
@@ -899,14 +902,12 @@ textarea.code-editor:focus {
           <button class="btn" id="saveModelsBtn">&#x2713; Save Models</button>
         </div>
         <div class="editor-wrapper">
-          <textarea id="models-editor" class="code-editor panel-glow"
-            placeholder="class Publisher(models.Model):&#10;    name = models.CharField(max_length=100)">{{ temp_models_code }}</textarea>
+          <textarea id="models-editor" class="code-editor panel-glow" data-initial="{{ temp_models_code|default:'' }}"
+            placeholder="class Product(models.Model):&#10;    name = models.CharField(max_length=255)&#10;    price = models.DecimalField(max_digits=10, decimal_places=2)&#10;    category = models.CharField(max_length=100)&#10;    created_at = models.DateTimeField(auto_now_add=True)&#10;    active = models.BooleanField(default=True)&#10;&#10;    def __str__(self):&#10;        return self.name"></textarea>
         </div>
       </div>
 
-      <div class="inner-v-resizer" id="innerVResizer" title="Drag to resize editors"></div>
-
-      <div class="editor-sub-pane" id="queryPane">
+      <div class="editor-sub-pane active" id="queryPane">
         <div class="section-title">
           <span><span class="label-accent">&#x276F;</span>&nbsp; ORM Query</span>
           <button class="btn green" id="runBtn">&#x25B6; Run Query</button>
@@ -972,6 +973,9 @@ textarea.code-editor:focus {
       </div>
     </div>
     {% endfor %}
+
+    <!-- Bottom-mid ad slot -->
+    <div class="ad-slot" id="adBottom"><span class="ad-tag">Ad</span>Advertisement space — shown when published</div>
 
   </div>
 </div>
@@ -1040,7 +1044,7 @@ textarea.code-editor:focus {
   function termSet(html) { term.innerHTML = html; }
   function termLog(msg, cls, typeSpeed = 0) {
     if (term.querySelector('.t-dim') && term.textContent.trim() === 'Waiting for input...') term.innerHTML = '';
-    
+
     const span = document.createElement('span');
     if (cls) span.className = cls;
     term.appendChild(span);
@@ -1066,7 +1070,7 @@ textarea.code-editor:focus {
     term.innerHTML = '<span class="t-dim">Cleared.</span>';
   };
 
-  /* ── Tabs ── */
+  /* ── Tabs (table browser) ── */
   function attachTabs() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.onclick = () => {
@@ -1080,15 +1084,35 @@ textarea.code-editor:focus {
   }
   attachTabs();
 
+  /* ── Load initial models code (if any) without blocking the placeholder ── */
+  const modelsEditor = document.getElementById('models-editor');
+  if (modelsEditor && modelsEditor.dataset.initial) {
+    modelsEditor.value = modelsEditor.dataset.initial;
+  }
+
+  /* ── Sidebar: switch between Console and Model panes ── */
+  const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+  sidebarBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      sidebarBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.editor-sub-pane').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById(btn.dataset.pane);
+      if (target) target.classList.add('active');
+    });
+  });
+
   /* ── Render tables ── */
   function renderTables(data) {
     const section = document.getElementById('bottomSection');
+    const adBottom = document.getElementById('adBottom');
     section.innerHTML = '';
     const tabRow = document.createElement('div');
     tabRow.className = 'tab-controls'; tabRow.id = 'tabControls';
     if (!data || !data.length) {
       tabRow.innerHTML = '<span style="color:var(--text-dim);font-size:11px;font-family:\'Rajdhani\',sans-serif;letter-spacing:1px;">No tables available</span>';
       section.appendChild(tabRow);
+      if (adBottom) section.appendChild(adBottom);
       return;
     }
     data.forEach((table, idx) => {
@@ -1126,6 +1150,7 @@ textarea.code-editor:focus {
       section.appendChild(container);
     });
     section.insertBefore(tabRow, section.firstChild);
+    if (adBottom) section.appendChild(adBottom);
     attachTabs();
   }
 
@@ -1156,7 +1181,7 @@ textarea.code-editor:focus {
     const { data } = await apiFetch('/api/execute/', { query });
     runBtn.classList.remove('running'); runBtn.textContent = '▶ Run Query';
     if (data.status === 'success') {
-      termSet(''); 
+      termSet('');
       const output = data.output || 'Query executed — no output.';
       termLog(output, 't-ok', 30);
       if (data.tables_data) renderTables(data.tables_data);
@@ -1176,12 +1201,6 @@ textarea.code-editor:focus {
       }
     });
   });
-
-  /* ── Profile dropdown ── */
-  const profileBtn = document.getElementById('profileBtn');
-  profileBtn.addEventListener('click', e => { e.stopPropagation(); profileBtn.classList.toggle('is-open'); });
-  document.addEventListener('click', e => { if (!profileBtn.contains(e.target)) profileBtn.classList.remove('is-open'); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') profileBtn.classList.remove('is-open'); });
 
   /* ════════════════════════════════════════
      RESIZABLE PANELS — mouse + touch
@@ -1210,55 +1229,6 @@ textarea.code-editor:focus {
     if (!hDrag) return;
     hDrag = false; hResizer.classList.remove('dragging');
     document.body.style.cursor = ''; document.body.style.userSelect = '';
-  });
-
-  /* ── Inner vertical resizer between Models and Query editors ── */
-  const innerVResizer = document.getElementById('innerVResizer');
-  const modelsPane    = document.getElementById('modelsPane');
-  const queryPane     = document.getElementById('queryPane');
-  let ivDrag = false, ivY0 = 0, ivMH0 = 0, ivQH0 = 0;
-
-  innerVResizer.addEventListener('mousedown', e => {
-    if (isMobile()) return;
-    ivDrag = true; ivY0 = e.clientY;
-    ivMH0 = modelsPane.offsetHeight; ivQH0 = queryPane.offsetHeight;
-    innerVResizer.classList.add('dragging');
-    document.body.style.cursor = 'row-resize';
-    document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove', e => {
-    if (!ivDrag) return;
-    const delta = e.clientY - ivY0;
-    const totalH = ivMH0 + ivQH0; const minH = 80;
-    const newModels = Math.min(Math.max(ivMH0 + delta, minH), totalH - minH);
-    modelsPane.style.flex = 'none'; queryPane.style.flex = 'none';
-    modelsPane.style.height = newModels + 'px';
-    queryPane.style.height  = (totalH - newModels) + 'px';
-  });
-  document.addEventListener('mouseup', () => {
-    if (!ivDrag) return;
-    ivDrag = false; innerVResizer.classList.remove('dragging');
-    document.body.style.cursor = ''; document.body.style.userSelect = '';
-  });
-
-  innerVResizer.addEventListener('touchstart', e => {
-    if (isMobile()) return;
-    ivDrag = true; ivY0 = e.touches[0].clientY;
-    ivMH0 = modelsPane.offsetHeight; ivQH0 = queryPane.offsetHeight;
-    innerVResizer.classList.add('dragging');
-  }, { passive: true });
-  document.addEventListener('touchmove', e => {
-    if (!ivDrag) return;
-    const delta = e.touches[0].clientY - ivY0;
-    const totalH = ivMH0 + ivQH0; const minH = 80;
-    const newModels = Math.min(Math.max(ivMH0 + delta, minH), totalH - minH);
-    modelsPane.style.flex = 'none'; queryPane.style.flex = 'none';
-    modelsPane.style.height = newModels + 'px';
-    queryPane.style.height  = (totalH - newModels) + 'px';
-  }, { passive: true });
-  document.addEventListener('touchend', () => {
-    if (ivDrag) { ivDrag = false; innerVResizer.classList.remove('dragging'); }
   });
 
   /* ── Top / Bottom (vertical) ── */
