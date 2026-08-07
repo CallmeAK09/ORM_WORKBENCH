@@ -1,12 +1,14 @@
 from django.db import connection
 
+from applications.compiler.models import Author, Book, Library
+
 
 def reset_default_table(env=None):
-    vendor = connecion.vendor             #Default db backend
+    vendor = connection.vendor             #Default db backend
 
     tables = [
         'compiler_library_books',
-        'compiler_libary',
+        'compiler_library',
         'compiler_book',
         'compiler_author',
     ]
@@ -16,7 +18,7 @@ def reset_default_table(env=None):
             cursor.execute(f"TRUNCATE TABLE {', '.join(tables)} RESTART IDENTITY CASCADE;")
         else:
             for table in tables:
-                cursor.execute(f"DELETE TABLE {table};")
+                cursor.execute(f"DELETE FROM {table};")
         
     # Authors
     a1 = Author.objects.create(
@@ -57,11 +59,11 @@ def reset_default_table(env=None):
     b5 = Book.objects.create(title='And Then There Were None',  isbn='9780007136834', author=a2, pages=272, published_date='1939-11-06', language='English')
 
     # Libraries (M2M ↔ Book)
-    l1 = Library.objects.create(name='Central Library',    location='New York',  established_date='1895-03-15')
-    l2 = Library.objects.create(name='Community Library',  location='London',    established_date='1922-07-04')
-    l3 = Library.objects.create(name='University Library', location='Boston',    established_date='1948-09-01')
-    l4 = Library.objects.create(name='State Library',      location='Sydney',    established_date='1869-11-20')
-    l5 = Library.objects.create(name='National Library',   location='Toronto',   established_date='1953-05-12')
+    l1 = Library.objects.create(name='Central Library',    location='New York',  established_at='1895-03-15')
+    l2 = Library.objects.create(name='Community Library',  location='London',    established_at='1922-07-04')
+    l3 = Library.objects.create(name='University Library', location='Boston',    established_at='1948-09-01')
+    l4 = Library.objects.create(name='State Library',      location='Sydney',    established_at='1869-11-20')
+    l5 = Library.objects.create(name='National Library',   location='Toronto',   established_at='1953-05-12')
 
     l1.books.set([b1, b2, b3])
     l2.books.set([b3, b5, b1])
@@ -91,9 +93,9 @@ def drop_temp_tables():
     }
 
     with connection.cursor() as cursor:
-        all_tables = connections.introspection.table_names(cursor):
+        all_tables = connection.introspection.table_names(cursor)
         for table in all_tables:
-            if table.startswith('compiler_') and not in default_tables:
+            if table.startswith('compiler_') and table not in default_tables:
                 try:
                     cursor.execute(f"DROP TABLE IF EXISTS {table} CASCADE;")
                 except Exception:

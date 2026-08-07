@@ -9,7 +9,7 @@ def enforce_validation():
     This ensures that Django's validation (max_length, blank, etc.) is enforced.
     """
 
-    original_save = models.Model.saved
+    original_save = models.Model.save
 
     def save_validated(self, *args, **kwargs):
         # We call full_clean() to trigger Django's field validation.
@@ -22,4 +22,4 @@ def enforce_validation():
     try:
         yield
     finally:
-        models.model.save = original_save
+        models.Model.save = original_save

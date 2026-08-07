@@ -1,5 +1,7 @@
 import json
 
+from django.db import models
+
 def serialize_value(val):
     """
     Conver field value into json-string to display in frontend,
@@ -25,7 +27,7 @@ def serialize_value(val):
     if isinstance(val, dict):
         return {k: serialize_value(v) for k, v in val.items()}
     if isinstance(val, (list, tuple)):
-        return (serialize_value(v) for v in val)
+        return [serialize_value(v) for v in val]
 
     try:
         json.dumps(val)
@@ -46,18 +48,18 @@ def get_record_dict(instance, model):
     # Regular fields
     for field in model._meta.fields:
         val = getattr(instance, field.attname)
-        record[filed.name] = serialize_value(val)
+        record[field.name] = serialize_value(val)
 
         # Foreign Key fields
-        if isinstance(filed, models.ForeignKey):
+        if isinstance(field, models.ForeignKey):
             try:
                 related_obj = getattr(instance, field.name)
                 if related_obj is not None:
-                    return record[field.name + '__str'] = str(related_obj)
+                     record[field.name + '__str'] = str(related_obj)
                 else:
-                    return record[field.name + '__str'] = None
+                     record[field.name + '__str'] = None
             except Exception:
-                return record[field.name + '__str'] = None
+                 record[field.name + '__str'] = None
 
     # Many To Many fields
     for field in model._meta.many_to_many:
@@ -77,12 +79,12 @@ def get_field_name(model):
 
     columns = []
 
-    for field in models._meta.fields:
-        column.append(field.name)
-        if isinstance(field, model.ForeignKey):
-            column.append(field.name + '__str')
+    for field in model._meta.fields:
+        columns.append(field.name)
+        if isinstance(field, models.ForeignKey):
+            columns.append(field.name + '__str')
 
-    for field in model.__meta.many_to_many:
-        column.append(field.name)
+    for field in model._meta.many_to_many:
+        columns.append(field.name)
 
     return columns

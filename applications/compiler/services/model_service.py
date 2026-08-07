@@ -1,6 +1,7 @@
-from django.db import connection
+from django.db import models, connection
 
-from service.serializer import get-field_name, get_record_dict
+from applications.compiler.services.serializer import get_field_name, get_record_dict
+from applications.compiler.models import Author, Book, Library
 
 
 def inject_app_label(code):
@@ -23,7 +24,7 @@ def inject_app_label(code):
             new_lines.append(line)
             continue
 
-        if is_inside and (stripped_line.startswith("class" or stripped_line == "")):
+        if is_inside and (stripped_line.startswith("class") or stripped_line == ""):
             new_lines.append(indent + "class Meta:")
             new_lines.append(indent + "    app_label = 'compiler'")
             is_inside = False
@@ -42,16 +43,16 @@ def get_tables_data(env=None):
     
     for model in [Author, Book, Library]:
         instances = (
-            models.objects.select_related()
+            model.objects.select_related()
             .prefetch_related(*[f.name for f in model._meta.many_to_many])
             .all()[:10]
         )
 
-         tables_data.append({
-            'name':mode.__name__,
-            'fields';get_field_name(model),
-            'records':[get_record_dict(inst, model for inst in instances)]
-         })
+        tables_data.append({
+            'name':model.__name__,
+            'fields':get_field_name(model),
+            'records':[get_record_dict(inst, model) for inst in instances]
+        })
 
     if env:
         for name, obj in env.items():
@@ -62,7 +63,7 @@ def get_tables_data(env=None):
                 table_name = obj._meta.db_table
 
                 if table_name not in connection.introspection.table_names():
-                    with conneciton.schema_editor() as schema_editor:
+                    with connection.schema_editor() as schema_editor:
                         schema_editor.create_model(obj)
 
                         try:
@@ -71,22 +72,22 @@ def get_tables_data(env=None):
                             pass
 
                 else:
-                    with connection.cursor as cursor:
+                    with connection.cursor() as cursor:
                         description = connection.introspection.get_table_description(cursor, table_name)
-                        existing_colums = {col.name for col in description}
+                        existing_columns = {col.name for col in description}
 
                     for field in obj._meta.fields:
                         if field.column not in existing_columns:
                             with connection.schema_editor() as schema_editor:
                                 try:
-                                    schema_editor.add_filed(obj, field)
+                                    schema_editor.add_field(obj, field)
                                 except Exception:
                                     pass
                 
                 try:
                     instances = (
-                        models.objects.select_related()
-                        .prefetch_related(*[f.name for f in model._meta.many_to_many])
+                        obj.objects.select_related()
+                        .prefetch_related(*[f.name for f in obj._meta.many_to_many])
                         .all()[:10]
                     )
 
@@ -96,7 +97,7 @@ def get_tables_data(env=None):
                 
                 tables_data.append({
                     'name':name + '(Custom)',
-                    'fields':get_field_names(obj),
+                    'fields':get_field_name(obj),
                     'records':records
                 })
     
