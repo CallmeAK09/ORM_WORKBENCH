@@ -66,11 +66,6 @@ def get_tables_data(env=None):
                     with connection.schema_editor() as schema_editor:
                         schema_editor.create_model(obj)
 
-                        try:
-                            obj.objects.create()
-                        except Exception:
-                            pass
-
                 else:
                     with connection.cursor() as cursor:
                         description = connection.introspection.get_table_description(cursor, table_name)

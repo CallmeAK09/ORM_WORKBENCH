@@ -13,10 +13,13 @@ class SecurityException(Exception):
 
 class ASTValidator(ast.NodeVisitor):
     def visit_Import(self, node):
-        raise SecurityException("Imporing modules are not allowed. Code without import.")
+        for alias in node.names:
+            if not alias.name.startswith("django"):
+                raise SecurityException("Importing modules other than 'django' is not allowed.")
 
     def visit_ImportFrom(self, node):
-        raise SecurityException("Importing from modules are not allowed. Code without import.")
+        if not node.module or (not node.module.startswith("django") and not node.module.startswith("applications.")):
+            raise SecurityException("Importing modules other than 'django' or app packages is not allowed.")
 
     def visit_Call(self, node):
         if isinstance(node.func, ast.Name):
