@@ -163,7 +163,8 @@ def build_context_service(request):
     env = None
     temp_models_code = request.session.get('temp_models_code', '')
     if temp_models_code:
-        temp_models_code = inject_app_label(temp_models_code)
+        suffix = get_session_suffix(request)
+        temp_models_code = inject_app_label(temp_models_code, suffix)
 
     if temp_models_code:
         clear_custom_models()
